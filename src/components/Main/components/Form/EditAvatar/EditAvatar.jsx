@@ -1,6 +1,6 @@
 export default function EditAvatar() {
   return (
-    <form className="form form_update-avatar" noValidate>
+    <form className="form form_update-avatar">
       <input
         className="form__input form__input_avatar-link"
         type="url"
@@ -9,7 +9,6 @@ export default function EditAvatar() {
         required
       />
       <span className="form__input-error"></span>
-
       <button type="submit" className="form__submit">
         Guardar
       </button>

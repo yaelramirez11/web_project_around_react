@@ -1,6 +1,6 @@
 export default function EditProfile() {
   return (
-    <form className="form" noValidate>
+    <>
       <input
         className="form__input form__input_name"
         type="text"
@@ -27,6 +27,6 @@ export default function EditProfile() {
       <div className="loader" id="loader">
         <div className="loader__id" id="loader__circle"></div>
       </div>
-    </form>
+    </>
   );
 }

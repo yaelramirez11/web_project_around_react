@@ -1,11 +1,24 @@
 import ImagePopup from "../ImagePopup/ImagePopup";
+import { useContext } from "react";
+import CurrentUserContext from "../../../../contexts/CurrentUserContext";
+import trashIcon from "../../../../images/Trash.png";
+import likeIcon from "../../../../images/Like.png";
 
-export default function Card({ card, handleOpenPopup }) {
+export default function Card({ card, handleOpenPopup, onCardLike }) {
+  const currentUser = useContext(CurrentUserContext);
+  const isLiked = card.likes?.some((user) => user._id === currentUser._id);
+  const cardLikeButtonClassName = `element__button ${
+    isLiked ? "element__button_active" : ""
+  }`;
+
   function handleImageClick() {
     handleOpenPopup({
       title: null,
       children: <ImagePopup card={card} />,
     });
+  }
+  function handleLikeClick() {
+    onCardLike(card);
   }
   return (
     <li className="element">
@@ -16,7 +29,7 @@ export default function Card({ card, handleOpenPopup }) {
           type="button"
         >
           <img
-            src="/images/trash.svg"
+            src={trashIcon}
             alt="Delete"
             className="element__delete-button-image"
           />
@@ -32,8 +45,11 @@ export default function Card({ card, handleOpenPopup }) {
           <button
             aria-label="Like card"
             type="button"
-            className="element__button"
-          />
+            className={cardLikeButtonClassName}
+            onClick={handleLikeClick}
+          >
+            <img className="element__button-image" src={likeIcon} />
+          </button>
         </div>
       </div>
     </li>

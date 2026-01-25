@@ -1,52 +1,64 @@
-import profilePic from "../../images/Avatar.png";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import EditProfile from "./components/Form/EditProfile/EditProfile";
 import Popup from "./components/Popup/Popup";
 import NewCard from "./components/Form/NewCard/NewCard";
 import EditAvatar from "./components/Form/EditAvatar/EditAvatar";
 import Card from "./components/Card/Card";
+import api from "../../utils/api";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 function Main() {
+  const currentUser = useContext(CurrentUserContext);
   const [popup, setPopup] = useState(null);
   const editProfilePopup = {
     title: "Editar Perfil",
     children: <EditProfile />,
   };
   const newCardPopup = { title: "Nuevo lugar", children: <NewCard /> };
-  const editAvatar = { title: "Foto de perfil", children: <EditAvatar /> };
+  const editAvatar = {
+    title: "Cambiar foto de perfil",
+    children: <EditAvatar />,
+  };
   function handleOpenPopup(popup) {
     setPopup(popup);
   }
   function handleClosePopup() {
     setPopup(null);
   }
-  const cards = [
-    {
-      isLiked: false,
-      _id: "5d1f0611d321eb4bdcd707dd",
-      name: "Yosemite Valley",
-      link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_yosemite.jpg",
-      owner: "5d1f0611d321eb4bdcd707dd",
-      createdAt: "2019-07-05T08:10:57.741Z",
-    },
-    {
-      isLiked: false,
-      _id: "5d1f064ed321eb4bdcd707de",
-      name: "Lake Louise",
-      link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_lake-louise.jpg",
-      owner: "5d1f0611d321eb4bdcd707dd",
-      createdAt: "2019-07-05T08:11:58.324Z",
-    },
-  ];
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((user) => user._id === currentUser._id);
 
-  console.log(cards);
+    api
+      .changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((currentCard) =>
+            currentCard._id === card._id ? newCard : currentCard,
+          ),
+        );
+      })
+      .catch((error) => console.error(error));
+  }
+
+  const [cards, setCards] = useState([]);
+  useEffect(() => {
+    api
+      .getInitialCards()
+      .then((data) => {
+        setCards(data);
+      })
+      .catch((err) => {
+        console.error("Error al obtener las tarjetas:", err);
+      });
+  }, []);
+
   return (
     <main className="content">
       <section className="profile">
         <div className="profile__content">
           <div className="profile__avatar">
             <img
-              src={profilePic}
+              src={currentUser.avatar}
               alt="Foto de perfil del usuario"
               className="profile__image"
             />
@@ -58,14 +70,14 @@ function Main() {
             ></button>
           </div>
           <div className="profile__data">
-            <h1 className="profile__username">Jacques Costeau</h1>
+            <h1 className="profile__username">{currentUser.name}</h1>
             <button
               aria-label="Editar Perfil"
               className="profile__edit-info"
               type="button"
               onClick={() => handleOpenPopup(editProfilePopup)}
             />
-            <h2 className="profile__about-me">Explorador</h2>
+            <h2 className="profile__about-me">{currentUser.about}</h2>
           </div>
         </div>
         <button
@@ -79,7 +91,12 @@ function Main() {
       </section>
       <section className="cards-container">
         {cards.map((card) => (
-          <Card key={card._id} card={card} handleOpenPopup={handleOpenPopup} />
+          <Card
+            key={card._id}
+            card={card}
+            onCardLike={handleCardLike}
+            handleOpenPopup={handleOpenPopup}
+          />
         ))}
       </section>
       {popup && (

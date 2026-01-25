@@ -10,7 +10,7 @@ export default function Popup(props) {
           aria-label="Cerrar"
           onClick={onClose}
         ></button>
-        <h3 className="form__title">{title}</h3>
+        <h3 className="popup__caption">{title}</h3>
         {children}
       </div>
     </section>

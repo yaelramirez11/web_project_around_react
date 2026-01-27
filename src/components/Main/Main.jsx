@@ -8,7 +8,7 @@ import api from "../../utils/api";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 function Main() {
-  const currentUser = useContext(CurrentUserContext);
+  const { currentUser } = useContext(CurrentUserContext);
   const [popup, setPopup] = useState(null);
   const editProfilePopup = {
     title: "Editar Perfil",
@@ -25,10 +25,21 @@ function Main() {
   function handleClosePopup() {
     setPopup(null);
   }
-  function handleCardLike(card) {
-    const isLiked = card.likes.some((user) => user._id === currentUser._id);
 
-    api
+  async function handleCardDelete(card) {
+    try {
+      await api.deleteCard(card._id);
+
+      setCards((state) =>
+        state.filter((currentCard) => currentCard._id !== card._id),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async function handleCardLike(card) {
+    const isLiked = card.isLiked;
+    await api
       .changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
         setCards((state) =>
@@ -96,6 +107,7 @@ function Main() {
             card={card}
             onCardLike={handleCardLike}
             handleOpenPopup={handleOpenPopup}
+            onCardDelete={handleCardDelete}
           />
         ))}
       </section>

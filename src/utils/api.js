@@ -30,7 +30,7 @@ class Api {
     return Promise.all([this.getUserinfoFromServer(), this.getInitialCards()]);
   }
 
-  updateUserInfo(name, about) {
+  updateUserInfo({ name, about }) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,

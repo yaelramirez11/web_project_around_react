@@ -1,12 +1,15 @@
 import ImagePopup from "../ImagePopup/ImagePopup";
 import { useContext } from "react";
 import CurrentUserContext from "../../../../contexts/CurrentUserContext";
-import trashIcon from "../../../../images/Trash.png";
-import likeIcon from "../../../../images/Like.png";
-
-export default function Card({ card, handleOpenPopup, onCardLike }) {
-  const currentUser = useContext(CurrentUserContext);
-  const isLiked = card.likes?.some((user) => user._id === currentUser._id);
+export default function Card({
+  card,
+  handleOpenPopup,
+  onCardLike,
+  onCardDelete,
+}) {
+  const { currentUser } = useContext(CurrentUserContext);
+  const isOwn = card.owner._id === currentUser._id;
+  const isLiked = card.isLiked;
   const cardLikeButtonClassName = `element__button ${
     isLiked ? "element__button_active" : ""
   }`;
@@ -20,20 +23,13 @@ export default function Card({ card, handleOpenPopup, onCardLike }) {
   function handleLikeClick() {
     onCardLike(card);
   }
+  function handleDeleteClick() {
+    onCardDelete(card);
+  }
+
   return (
     <li className="element">
       <div className="element__rectangle">
-        <button
-          aria-label="Delete card"
-          className="element__delete-button"
-          type="button"
-        >
-          <img
-            src={trashIcon}
-            alt="Delete"
-            className="element__delete-button-image"
-          />
-        </button>
         <img
           className="element__image"
           src={card.link}
@@ -47,9 +43,15 @@ export default function Card({ card, handleOpenPopup, onCardLike }) {
             type="button"
             className={cardLikeButtonClassName}
             onClick={handleLikeClick}
-          >
-            <img className="element__button-image" src={likeIcon} />
-          </button>
+          ></button>
+          {isOwn && (
+            <button
+              aria-label="Delete card"
+              className="element__delete-button"
+              type="button"
+              onClick={handleDeleteClick}
+            ></button>
+          )}
         </div>
       </div>
     </li>

@@ -1,67 +1,33 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext } from "react";
 import EditProfile from "./components/Form/EditProfile/EditProfile";
 import Popup from "./components/Popup/Popup";
 import NewCard from "./components/Form/NewCard/NewCard";
 import EditAvatar from "./components/Form/EditAvatar/EditAvatar";
 import Card from "./components/Card/Card";
-import api from "../../utils/api";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 
-function Main() {
+function Main({
+  onOpenPopup,
+  onClosePopup,
+  popup,
+  cards,
+  onCardLike,
+  onCardDelete,
+  onAddPlaceSubmit,
+}) {
   const { currentUser } = useContext(CurrentUserContext);
-  const [popup, setPopup] = useState(null);
   const editProfilePopup = {
     title: "Editar Perfil",
     children: <EditProfile />,
   };
-  const newCardPopup = { title: "Nuevo lugar", children: <NewCard /> };
+  const newCardPopup = {
+    title: "Nuevo lugar",
+    children: <NewCard onAddPlaceSubmit={onAddPlaceSubmit} />,
+  };
   const editAvatar = {
     title: "Cambiar foto de perfil",
     children: <EditAvatar />,
   };
-  function handleOpenPopup(popup) {
-    setPopup(popup);
-  }
-  function handleClosePopup() {
-    setPopup(null);
-  }
-
-  async function handleCardDelete(card) {
-    try {
-      await api.deleteCard(card._id);
-
-      setCards((state) =>
-        state.filter((currentCard) => currentCard._id !== card._id),
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  async function handleCardLike(card) {
-    const isLiked = card.isLiked;
-    await api
-      .changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((currentCard) =>
-            currentCard._id === card._id ? newCard : currentCard,
-          ),
-        );
-      })
-      .catch((error) => console.error(error));
-  }
-
-  const [cards, setCards] = useState([]);
-  useEffect(() => {
-    api
-      .getInitialCards()
-      .then((data) => {
-        setCards(data);
-      })
-      .catch((err) => {
-        console.error("Error al obtener las tarjetas:", err);
-      });
-  }, []);
 
   return (
     <main className="content">
@@ -77,7 +43,7 @@ function Main() {
               className="profile__change-photo"
               aria-label="Foto de perfil"
               type="button"
-              onClick={() => handleOpenPopup(editAvatar)}
+              onClick={() => onOpenPopup(editAvatar)}
             ></button>
           </div>
           <div className="profile__data">
@@ -86,7 +52,7 @@ function Main() {
               aria-label="Editar Perfil"
               className="profile__edit-info"
               type="button"
-              onClick={() => handleOpenPopup(editProfilePopup)}
+              onClick={() => onOpenPopup(editProfilePopup)}
             />
             <h2 className="profile__about-me">{currentUser.about}</h2>
           </div>
@@ -95,7 +61,7 @@ function Main() {
           className="profile__add-profile"
           aria-label="Agregar nueva tarjeta"
           type="button"
-          onClick={() => handleOpenPopup(newCardPopup)}
+          onClick={() => onOpenPopup(newCardPopup)}
         >
           +
         </button>
@@ -105,14 +71,14 @@ function Main() {
           <Card
             key={card._id}
             card={card}
-            onCardLike={handleCardLike}
-            handleOpenPopup={handleOpenPopup}
-            onCardDelete={handleCardDelete}
+            onCardLike={onCardLike}
+            handleOpenPopup={onOpenPopup}
+            onCardDelete={onCardDelete}
           />
         ))}
       </section>
       {popup && (
-        <Popup onClose={handleClosePopup} title={popup.title}>
+        <Popup onClose={onClosePopup} title={popup.title}>
           {popup.children}
         </Popup>
       )}

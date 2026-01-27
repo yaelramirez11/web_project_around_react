@@ -8,7 +8,7 @@ export default function Card({
   onCardDelete,
 }) {
   const { currentUser } = useContext(CurrentUserContext);
-  const isOwn = card.owner._id === currentUser._id;
+  const isOwn = card.owner === currentUser._id;
   const isLiked = card.isLiked;
   const cardLikeButtonClassName = `element__button ${
     isLiked ? "element__button_active" : ""

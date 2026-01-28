@@ -3,14 +3,14 @@ import line from "../../images/Line.png";
 
 function Header() {
   return (
-    <Header className="Header">
+    <header className="header">
       <img
         src={aroundTheUs}
         alt="Logo de AroundtheUS"
-        className="Header__image"
+        className="header__image"
       />
-      <img src={line} alt="Línea blanca" className="Header__line" />
-    </Header>
+      <img src={line} alt="Línea blanca" className="header__line" />
+    </header>
   );
 }
 
